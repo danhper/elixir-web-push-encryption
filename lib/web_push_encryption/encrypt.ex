@@ -1,5 +1,11 @@
 defmodule WebPushEncryption.Encrypt do
-  require Logger
+  @moduledoc """
+  Module to encrypt notification payloads.
+
+  See the following links for details about the encryption process.
+
+  https://developers.google.com/web/updates/2016/03/web-push-encryption?hl=en
+  """
 
   alias WebPushEncryption.Crypto
 
@@ -9,6 +15,27 @@ defmodule WebPushEncryption.Encrypt do
 
   @auth_info "Content-Encoding: auth" <> <<0>>
 
+
+  @doc """
+  Encrypts a web push notification body.
+
+  ## Arguments
+
+    * `message` the body to encrypt
+    * `subscription`: See `WebPushEncryption.Push.send_web_push/3`
+    * `padding_length`: An optional padding length
+
+  ## Return value
+
+  Returns the encrypted body as well as the necessary information in the following form:
+
+  ```elixir
+  %{ciphertext: ciphertext,               # the encrypted payload
+    salt: salt,                           # the generated salt used during the encryption
+    server_public_key: server_public_key} # the generated public key used during encryption
+  ```
+  """
+  @spec encrypt(message :: binary, subscription :: map, padding_length :: non_neg_integer) :: map
   def encrypt(message, subscription, padding_length \\ 0)
   def encrypt(message, _subscription, padding_length)
       when byte_size(message) + padding_length > @max_payload_length do
