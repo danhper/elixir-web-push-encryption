@@ -1,14 +1,13 @@
 defmodule WebPushEncryption.Encrypt do
+  require Logger
+
+  alias WebPushEncryption.Crypto
+
   @max_payload_length 4078
 
   @one_buffer <<1>>
 
   @auth_info "Content-Encoding: auth" <> <<0>>
-
-  @example_server_keys %{
-    public: "BOg5KfYiBdDDRF12Ri17y3v+POPr8X0nVP2jDjowPVI/DMKU1aQ3OLdPH1iaakvR9/PHq6tNCzJH35v/JUz2crY=",
-    private: "uDNsfsz91y2ywQeOHljVoiUg3j5RGrDVAswRqjP3v90="
-  }
 
   def encrypt(message, subscription, padding_length \\ 0)
   def encrypt(message, _subscription, padding_length)
@@ -19,7 +18,7 @@ defmodule WebPushEncryption.Encrypt do
   def encrypt(message, subscription, padding_length) do
     padding = make_padding(padding_length)
 
-    plaintext = message <> padding
+    plaintext = padding <> message
 
     :ok = validate_subscription(subscription)
 
@@ -29,11 +28,9 @@ defmodule WebPushEncryption.Encrypt do
     :ok = validate_length(client_auth_token, 16, "Subscription's Auth token is not 16 bytes.")
     :ok = validate_length(client_public_key, 65, "Subscription's client key (p256dh) is invalid.")
 
-    # salt = :crypto.rand_bytes(16)
-    salt = :binary.copy(<<0>>, 16)
+    salt = Crypto.rand_bytes(16)
 
-    # {server_public_key, server_private_key} = :crypto.generate_key(:ecdh, :prime256v1)
-    {server_public_key, server_private_key} = {Base.decode64!(@example_server_keys.public), Base.decode64!(@example_server_keys.private)}
+    {server_public_key, server_private_key} = Crypto.generate_key(:ecdh, :prime256v1)
 
     shared_secret = :crypto.compute_key(:ecdh, client_public_key, server_private_key, :prime256v1)
 
@@ -85,7 +82,7 @@ defmodule WebPushEncryption.Encrypt do
   end
 
   defp encrypt_payload(plaintext, content_encryption_key, nonce) do
-    {cipher_text, cipher_tag} = :crypto.block_encrypt(:aes_gcm, content_encryption_key, nonce, {:binary.copy(<<0>>, 16), plaintext})
+    {cipher_text, cipher_tag} = :crypto.block_encrypt(:aes_gcm, content_encryption_key, nonce, {:binary.copy("", 16), plaintext})
     cipher_text <> cipher_tag
   end
 
