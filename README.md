@@ -4,21 +4,21 @@ Elixir implementation of [Web Push Payload encryption](https://developers.google
 
 ## Installation
 
-  1. Add `web_push_encryption` to your list of dependencies in `mix.exs`.
+1. Add `web_push_encryption` to your list of dependencies in `mix.exs`.
 
-    ```elixir
-    def deps do
-      [{:web_push_encryption, "~> 0.1.0"}]
-    end
-    ```
+  ```elixir
+  def deps do
+    [{:web_push_encryption, "~> 0.1.1"}]
+  end
+  ```
 
-  2. Ensure `web_push_encryption` is started before your application:
+2. Ensure `web_push_encryption` is started before your application:
 
-    ```elixir
-    def application do
-      [applications: [:web_push_encryption]]
-    end
-    ```
+  ```elixir
+  def application do
+    [applications: [:web_push_encryption]]
+  end
+  ```
 
 ## Usage
 
@@ -39,7 +39,7 @@ encrypted_body = WebPushEncryption.encrypt(body, subscription)
 {:ok, response} = WebPushEncryption.send_web_push(body, subscription, gcm_api_key)
 ```
 
-See the docs for more info.
+See [the docs](https://hexdocs.pm/web_push_encryption) for more info.
 
 ## Client Sample
 

@@ -1,4 +1,6 @@
 defmodule WebPushEncryption.Crypto do
+  @moduledoc false
+
   @callback generate_key(atom, atom) :: {binary, binary}
   @callback rand_bytes(non_neg_integer) :: binary
 
