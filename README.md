@@ -98,3 +98,7 @@ self.addEventListener('push', function(event) {
     </body>
 </html>
 ```
+
+## Credits
+
+The implementation is ported from [googlechrome/web-push-encryption](https://github.com/GoogleChrome/web-push-encryption)
