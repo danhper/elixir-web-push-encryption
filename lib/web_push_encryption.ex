@@ -1,0 +1,2 @@
+defmodule WebPushEncryption do
+end
