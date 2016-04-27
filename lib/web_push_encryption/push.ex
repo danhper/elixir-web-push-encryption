@@ -12,7 +12,7 @@ defmodule WebPushEncryption.Push do
     headers = [
       {"Content-Encoding", "aesgcm"},
       {"Encryption", "salt=#{ub64(payload.salt)}"},
-      {"Crypto-KeyEncryption", "dh=#{ub64(payload.serverPublicKey)}"},
+      {"Crypto-Key", "dh=#{ub64(payload.server_public_key)}"},
       {"Authorization", "key=#{auth_token}"}
     ]
     HTTPoison.post(endpoint, payload.ciphertext, headers)
