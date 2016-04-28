@@ -109,7 +109,7 @@ defmodule WebPushEncryption.Encrypt do
   end
 
   defp encrypt_payload(plaintext, content_encryption_key, nonce) do
-    {cipher_text, cipher_tag} = :crypto.block_encrypt(:aes_gcm, content_encryption_key, nonce, {:binary.copy("", 16), plaintext})
+    {cipher_text, cipher_tag} = :crypto.block_encrypt(:aes_gcm, content_encryption_key, nonce, {"", plaintext})
     cipher_text <> cipher_tag
   end
 
