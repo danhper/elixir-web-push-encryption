@@ -30,6 +30,7 @@ defmodule WebPushEncryption.Push do
 
     payload = WebPushEncryption.Encrypt.encrypt(message, subscription)
     headers = [
+      {"TTL", "0"},
       {"Content-Encoding", "aesgcm"},
       {"Encryption", "salt=#{ub64(payload.salt)}"},
       {"Crypto-Key", "dh=#{ub64(payload.server_public_key)}"},
