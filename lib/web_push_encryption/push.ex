@@ -23,11 +23,11 @@ defmodule WebPushEncryption.Push do
   """
   @spec send_web_push(message :: binary, subscription :: map, auth_token :: binary) :: {:ok, any} | {:error, atom}
   def send_web_push(message, subscription, auth_token \\ nil)
-  def send_web_push(_message, %{endpoint: @gcm_url <> registrationId} = subscription, nil) do
+  def send_web_push(_message, %{endpoint: @gcm_url <> _registrationId} = _subscription, nil) do
     raise ArgumentError, "send_web_push requires an auth_token for gcm endpoints"
   end
   def send_web_push(message, %{endpoint: endpoint} = subscription, auth_token) do
-    isGcm = String.contains? endpoint,  @gcm_url
+    is_gcm = String.contains? endpoint,  @gcm_url
 
     payload = WebPushEncryption.Encrypt.encrypt(message, subscription)
     headers = [
@@ -37,7 +37,7 @@ defmodule WebPushEncryption.Push do
       {"Crypto-Key", "dh=#{ub64(payload.server_public_key)}"}
     ]
 
-    if isGcm do
+    if is_gcm do
       endpoint = String.replace(endpoint, @gcm_url, @temp_gcm_url)
       headers = headers ++ [{"Authorization", "key=#{auth_token}"}]
     end
