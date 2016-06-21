@@ -21,13 +21,13 @@ defmodule WebPushEncryption.Push do
 
   Returns the result of `HTTPoison.post`
   """
-  @spec send_web_push(message :: binary, subscription :: map, auth_token :: binary) :: {:ok, any} | {:error, atom}
+  @spec send_web_push(message :: binary, subscription :: map, auth_token :: binary | nil) :: {:ok, any} | {:error, atom}
   def send_web_push(message, subscription, auth_token \\ nil)
-  def send_web_push(_message, %{endpoint: @gcm_url <> _registrationId} = _subscription, nil) do
+  def send_web_push(_message, %{endpoint: @gcm_url <> _registration_id}, nil) do
     raise ArgumentError, "send_web_push requires an auth_token for gcm endpoints"
   end
   def send_web_push(message, %{endpoint: endpoint} = subscription, auth_token) do
-    is_gcm = String.contains? endpoint,  @gcm_url
+    is_gcm = String.contains?(endpoint,  @gcm_url)
 
     payload = WebPushEncryption.Encrypt.encrypt(message, subscription)
     headers = [
