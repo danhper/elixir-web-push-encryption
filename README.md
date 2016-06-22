@@ -1,5 +1,7 @@
 # WebPushEncryption
 
+[![Build Status](https://travis-ci.org/tuvistavie/elixir-web-push-encryption.svg?branch=master)](https://travis-ci.org/tuvistavie/elixir-web-push-encryption)
+
 Elixir implementation of [Web Push Payload encryption](https://developers.google.com/web/updates/2016/03/web-push-encryption?hl=en).
 
 ## Installation
