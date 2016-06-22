@@ -49,8 +49,8 @@ defmodule WebPushEncryption.Encrypt do
 
     :ok = validate_subscription(subscription)
 
-    client_public_key = Base.url_decode64!(subscription.keys.p256dh)
-    client_auth_token = Base.url_decode64!(subscription.keys.auth)
+    client_public_key = Base.url_decode64!(subscription.keys.p256dh, padding: false)
+    client_auth_token = Base.url_decode64!(subscription.keys.auth, padding: false)
 
     :ok = validate_length(client_auth_token, 16, "Subscription's Auth token is not 16 bytes.")
     :ok = validate_length(client_public_key, 65, "Subscription's client key (p256dh) is invalid.")
