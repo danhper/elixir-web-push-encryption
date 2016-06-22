@@ -43,61 +43,9 @@ See [the docs](https://hexdocs.pm/web_push_encryption) for more info.
 
 ## Client Sample
 
-Here is the strict minimum client code to try it, you will need Chrome >= 50.
+You can find the strict minimum client code to try the library under [client-sample](./client-sample/).
+You will need Chrome >= 50.
 It should also work for Firefox >= 44 but I did not try it yet.
-
-* `main.js`
-
-```js
-navigator.serviceWorker
-  .register('sw.js').then(function(reg) {
-    reg.pushManager.subscribe({
-      userVisibleOnly: true
-    }).then(function(sub) {
-      console.log('subscription:', JSON.stringify(sub));
-    }).catch(e => console.log(e));
-  }).catch(function(error) {
-    console.log('error: ', error);
-  });
-```
-
-* `sw.js`
-
-```js
-self.addEventListener('push', function(event) {
-  if (event.data) {
-    console.log(event.data.json());
-  }
-});
-```
-
-* `manifest.json`
-
-```json
-{
-    "short_name": "Push Sample",
-    "name": "Push sample",
-    "start_url": "index.html",
-    "gcm_sender_id": "GCM_SENDER_ID"
-}
-```
-
-* `index.html`
-
-
-```html
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8"/>
-        <title>Document</title>
-        <link rel="manifest" href="/manifest.json">
-        <script src="main.js"></script>
-    </head>
-    <body>
-    </body>
-</html>
-```
 
 ## Credits
 

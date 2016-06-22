@@ -1,0 +1,6 @@
+{
+    "short_name": "Push Sample",
+    "name": "Push sample",
+    "start_url": "index.html",
+    "gcm_sender_id": "GCM_SENDER_ID"
+}
