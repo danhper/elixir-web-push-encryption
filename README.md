@@ -46,8 +46,7 @@ See [the docs](https://hexdocs.pm/web_push_encryption) for more info.
 ## Client Sample
 
 You can find the strict minimum client code to try the library under [client-sample](./client-sample/).
-You will need Chrome >= 50.
-It should also work for Firefox >= 44 but I did not try it yet.
+You will need Chrome >= 50 or Firefox >= 44.
 
 ## Credits
 
