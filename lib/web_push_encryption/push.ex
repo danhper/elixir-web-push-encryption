@@ -27,8 +27,6 @@ defmodule WebPushEncryption.Push do
     raise ArgumentError, "send_web_push requires an auth_token for gcm endpoints"
   end
   def send_web_push(message, %{endpoint: endpoint} = subscription, auth_token) do
-    is_gcm = String.contains?(endpoint,  @gcm_url)
-
     payload = WebPushEncryption.Encrypt.encrypt(message, subscription)
     headers = [
       {"TTL", "0"},
@@ -37,16 +35,25 @@ defmodule WebPushEncryption.Push do
       {"Crypto-Key", "dh=#{ub64(payload.server_public_key)}"}
     ]
 
-    if is_gcm do
-      endpoint = String.replace(endpoint, @gcm_url, @temp_gcm_url)
-      headers = headers ++ [{"Authorization", "key=#{auth_token}"}]
-    end
+    {endpoint, headers} = make_request_params(endpoint, headers, auth_token)
 
     HTTPoison.post(endpoint, payload.ciphertext, headers)
   end
   def send_web_push(_message, _subscription, _auth_token) do
     raise ArgumentError, "send_web_push expects a subscription endpoint with an endpoint parameter"
   end
+
+  defp make_request_params(endpoint, headers, auth_token) do
+    if gcm_url?(endpoint) do
+      {make_gcm_endpoint(endpoint), headers ++ [gcm_authorization(auth_token)]}
+    else
+      {endpoint, headers}
+    end
+  end
+
+  defp gcm_url?(url), do: String.contains?(url,  @gcm_url)
+  defp make_gcm_endpoint(endpoint), do: String.replace(endpoint, @gcm_url, @temp_gcm_url)
+  defp gcm_authorization(auth_token), do: {"Authorization", "key=#{auth_token}"}
 
   defp ub64(value) do
     Base.url_encode64(value, padding: false)
