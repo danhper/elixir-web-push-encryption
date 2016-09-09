@@ -13,9 +13,9 @@ defmodule WebPushEncryption.Push do
 
     * `message` is a binary payload. It can be JSON encoded
     * `subscription` is the subscription information received from the client.
-       It should have the following form: `%{keys: %{auth: AUTH, p256dh: P256DH}, endpoint: ENDPOIONT}`
+       It should have the following form: `%{keys: %{auth: AUTH, p256dh: P256DH}, endpoint: ENDPOINT}`
     * `auth_token` [Optional] is the GCM api key matching the `gcm_sender_id` from the client `manifest.json`.
-       It is not necessary for mozzilla endpoints.
+       It is not necessary for Mozilla endpoints.
 
   ## Return value
 
