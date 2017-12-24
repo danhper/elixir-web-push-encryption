@@ -9,7 +9,7 @@ defmodule WebPushEncryption.Crypto do
   end
 
   def rand_bytes(bytes_num) do
-    impl.rand_bytes(bytes_num)
+    impl.strong_rand_bytes(bytes_num)
   end
 
   defp impl do
