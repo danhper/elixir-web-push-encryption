@@ -29,7 +29,7 @@ defmodule WebPushEncryption.EncryptTest do
 
     @example_server_keys Module.get_attribute(WebPushEncryption.EncryptTest, :example_server_keys)
 
-    def rand_bytes(n) do
+    def strong_rand_bytes(n) do
       :binary.copy(<<0>>, n)
     end
 
