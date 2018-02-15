@@ -55,7 +55,7 @@ defmodule WebPushEncryption.Encrypt do
     :ok = validate_length(client_auth_token, 16, "Subscription's Auth token is not 16 bytes.")
     :ok = validate_length(client_public_key, 65, "Subscription's client key (p256dh) is invalid.")
 
-    salt = Crypto.rand_bytes(16)
+    salt = Crypto.strong_rand_bytes(16)
 
     {server_public_key, server_private_key} = Crypto.generate_key(:ecdh, :prime256v1)
 
