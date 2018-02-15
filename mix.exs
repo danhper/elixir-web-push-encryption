@@ -11,8 +11,8 @@ defmodule WebPushEncryption.Mixfile do
      source_url: "https://github.com/tuvistavie/elixir-web-push-encryption",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     package: package,
-     deps: deps,
+     package: package(),
+     deps: deps(),
      docs: [source_ref: "#{@version}", extras: ["README.md"], main: "readme"]]
   end
 
