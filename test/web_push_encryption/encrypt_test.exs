@@ -11,8 +11,6 @@ defmodule WebPushEncryption.EncryptTest do
     private: "uDNsfsz91y2ywQeOHljVoiUg3j5RGrDVAswRqjP3v90="
   }
 
-  @example_salt "AAAAAAAAAAAAAAAAAAAAAA"
-
   @valid_subscription %{
     endpoint: "https://example-endpoint.com/example/1234",
     keys: %{
