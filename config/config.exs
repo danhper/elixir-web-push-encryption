@@ -29,7 +29,6 @@ use Mix.Config
 #
 #     import_config "#{Mix.env}.exs"
 
-config :web_push_encryption, :vapid_details,
-  subject: "mailto:administrator@example.com",
-  public_key: "BPdTTUfAs1WuIWhnCxEed1ngeysGfjDkxa8Glv3dTlCjMcTXgUChXzZpm0VtqwaYhFFLPzdmyDiV207d4r04j8Q",
-  private_key: "VKEwdAVds8EIirGISfNDCSIaBkCbM_DiFazF4eIR198"
+if Mix.env == :test do
+  import_config "test.exs"
+end
