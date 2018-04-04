@@ -6,7 +6,7 @@ defmodule WebPushEncryption.Mixfile do
   def project do
     [app: :web_push_encryption,
      version: @version,
-     elixir: "~> 1.1",
+     elixir: "~> 1.4",
      description: "Web push encryption lilbrary",
      source_url: "https://github.com/tuvistavie/elixir-web-push-encryption",
      build_embedded: Mix.env == :prod,
