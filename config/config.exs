@@ -28,3 +28,8 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 #     import_config "#{Mix.env}.exs"
+
+config :web_push_encryption, :vapid_details,
+  subject: "mailto:administrator@example.com",
+  public_key: "BPdTTUfAs1WuIWhnCxEed1ngeysGfjDkxa8Glv3dTlCjMcTXgUChXzZpm0VtqwaYhFFLPzdmyDiV207d4r04j8Q",
+  private_key: "VKEwdAVds8EIirGISfNDCSIaBkCbM_DiFazF4eIR198"

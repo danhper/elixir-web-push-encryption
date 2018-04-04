@@ -3,6 +3,8 @@ defmodule WebPushEncryption.Push do
   Module to send web push notifications with a payload through GCM
   """
 
+  alias WebPushEncryption.Vapid
+
   @gcm_url "https://android.googleapis.com/gcm/send"
   @temp_gcm_url "https://gcm-http.googleapis.com/gcm"
 
@@ -28,14 +30,20 @@ defmodule WebPushEncryption.Push do
   end
   def send_web_push(message, %{endpoint: endpoint} = subscription, auth_token) do
     payload = WebPushEncryption.Encrypt.encrypt(message, subscription)
-    headers = [
-      {"TTL", "0"},
-      {"Content-Encoding", "aesgcm"},
-      {"Encryption", "salt=#{ub64(payload.salt)}"},
-      {"Crypto-Key", "dh=#{ub64(payload.server_public_key)}"}
-    ]
+
+    headers = Vapid.get_headers(make_audience(endpoint), "aesgcm")
+    |> Map.merge(
+      %{
+        "TTL" => "0",
+        "Content-Encoding" => "aesgcm",
+        "Encryption" => "salt=#{ub64(payload.salt)}",
+      })
+
+    headers = headers |> Map.put("Crypto-Key", "dh=#{ub64(payload.server_public_key)};" <> headers["Crypto-Key"])
 
     {endpoint, headers} = make_request_params(endpoint, headers, auth_token)
+
+    IO.inspect headers, label: "headers"
 
     HTTPoison.post(endpoint, payload.ciphertext, headers)
   end
@@ -49,6 +57,11 @@ defmodule WebPushEncryption.Push do
     else
       {endpoint, headers}
     end
+  end
+
+  defp make_audience(endpoint) do
+    parsed = URI.parse(endpoint)
+    parsed.scheme <> "://" <> parsed.host
   end
 
   defp gcm_url?(url), do: String.contains?(url,  @gcm_url)
