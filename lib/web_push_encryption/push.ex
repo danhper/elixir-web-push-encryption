@@ -42,9 +42,6 @@ defmodule WebPushEncryption.Push do
     headers = headers |> Map.put("Crypto-Key", "dh=#{ub64(payload.server_public_key)};" <> headers["Crypto-Key"])
 
     {endpoint, headers} = make_request_params(endpoint, headers, auth_token)
-
-    IO.inspect headers, label: "headers"
-
     HTTPoison.post(endpoint, payload.ciphertext, headers)
   end
   def send_web_push(_message, _subscription, _auth_token) do
