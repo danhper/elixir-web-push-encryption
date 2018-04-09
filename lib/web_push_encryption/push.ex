@@ -23,29 +23,36 @@ defmodule WebPushEncryption.Push do
 
   Returns the result of `HTTPoison.post`
   """
-  @spec send_web_push(message :: binary, subscription :: map, auth_token :: binary | nil) :: {:ok, any} | {:error, atom}
+  @spec send_web_push(message :: binary, subscription :: map, auth_token :: binary | nil) ::
+          {:ok, any} | {:error, atom}
   def send_web_push(message, subscription, auth_token \\ nil)
+
   def send_web_push(_message, %{endpoint: @gcm_url <> _registration_id}, nil) do
     raise ArgumentError, "send_web_push requires an auth_token for gcm endpoints"
   end
+
   def send_web_push(message, %{endpoint: endpoint} = subscription, auth_token) do
     payload = WebPushEncryption.Encrypt.encrypt(message, subscription)
 
-    headers = Vapid.get_headers(make_audience(endpoint), "aesgcm")
-    |> Map.merge(
-      %{
+    headers =
+      Vapid.get_headers(make_audience(endpoint), "aesgcm")
+      |> Map.merge(%{
         "TTL" => "0",
         "Content-Encoding" => "aesgcm",
-        "Encryption" => "salt=#{ub64(payload.salt)}",
+        "Encryption" => "salt=#{ub64(payload.salt)}"
       })
 
-    headers = headers |> Map.put("Crypto-Key", "dh=#{ub64(payload.server_public_key)};" <> headers["Crypto-Key"])
+    headers =
+      headers
+      |> Map.put("Crypto-Key", "dh=#{ub64(payload.server_public_key)};" <> headers["Crypto-Key"])
 
     {endpoint, headers} = make_request_params(endpoint, headers, auth_token)
     http_client().post(endpoint, payload.ciphertext, headers)
   end
+
   def send_web_push(_message, _subscription, _auth_token) do
-    raise ArgumentError, "send_web_push expects a subscription endpoint with an endpoint parameter"
+    raise ArgumentError,
+          "send_web_push expects a subscription endpoint with an endpoint parameter"
   end
 
   defp make_request_params(endpoint, headers, auth_token) do
@@ -61,7 +68,7 @@ defmodule WebPushEncryption.Push do
     parsed.scheme <> "://" <> parsed.host
   end
 
-  defp gcm_url?(url), do: String.contains?(url,  @gcm_url)
+  defp gcm_url?(url), do: String.contains?(url, @gcm_url)
   defp make_gcm_endpoint(endpoint), do: String.replace(endpoint, @gcm_url, @temp_gcm_url)
   defp gcm_authorization(auth_token), do: %{"Authorization" => "key=#{auth_token}"}
 

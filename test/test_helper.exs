@@ -8,7 +8,8 @@ defmodule Fixtures do
 
   def example_server_keys() do
     %{
-      public: "BOg5KfYiBdDDRF12Ri17y3v+POPr8X0nVP2jDjowPVI/DMKU1aQ3OLdPH1iaakvR9/PHq6tNCzJH35v/JUz2crY=",
+      public:
+        "BOg5KfYiBdDDRF12Ri17y3v+POPr8X0nVP2jDjowPVI/DMKU1aQ3OLdPH1iaakvR9/PHq6tNCzJH35v/JUz2crY=",
       private: "uDNsfsz91y2ywQeOHljVoiUg3j5RGrDVAswRqjP3v90="
     }
   end
@@ -18,7 +19,8 @@ defmodule Fixtures do
       endpoint: "https://example-endpoint.com/example/1234",
       keys: %{
         auth: "8eDyX_uCN0XRhSbY5hs7Hg==",
-        p256dh: "BCIWgsnyXDv1VkhqL2P7YRBvdeuDnlwAPT2guNhdIoW3IP7GmHh1SMKPLxRf7x8vJy6ZFK3ol2ohgn_-0yP7QQA="
+        p256dh:
+          "BCIWgsnyXDv1VkhqL2P7YRBvdeuDnlwAPT2guNhdIoW3IP7GmHh1SMKPLxRf7x8vJy6ZFK3ol2ohgn_-0yP7QQA="
       }
     }
   end
@@ -36,13 +38,12 @@ defmodule HTTPoisonSandbox do
   end
 
   def request(method, url, body \\ "", headers \\ [], options \\ []) do
-    req = %{method: method, url: url, body: body,
-            headers: headers, options: options}
-    Agent.update(__MODULE__, &([req | &1]))
+    req = %{method: method, url: url, body: body, headers: headers, options: options}
+    Agent.update(__MODULE__, &[req | &1])
   end
 
   def requests() do
-    Agent.get(__MODULE__, &(&1))
+    Agent.get(__MODULE__, & &1)
   end
 
   def reset_requests!() do
