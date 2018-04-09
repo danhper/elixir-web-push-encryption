@@ -42,7 +42,7 @@ defmodule WebPushEncryption.Push do
     headers = headers |> Map.put("Crypto-Key", "dh=#{ub64(payload.server_public_key)};" <> headers["Crypto-Key"])
 
     {endpoint, headers} = make_request_params(endpoint, headers, auth_token)
-    HTTPoison.post(endpoint, payload.ciphertext, headers)
+    http_client().post(endpoint, payload.ciphertext, headers)
   end
   def send_web_push(_message, _subscription, _auth_token) do
     raise ArgumentError, "send_web_push expects a subscription endpoint with an endpoint parameter"
@@ -67,5 +67,9 @@ defmodule WebPushEncryption.Push do
 
   defp ub64(value) do
     Base.url_encode64(value, padding: false)
+  end
+
+  defp http_client() do
+    Application.get_env(:web_push_encryption, :http_client, HTTPoison)
   end
 end
