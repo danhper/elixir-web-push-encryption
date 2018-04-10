@@ -19,15 +19,18 @@ defmodule WebPushEncryption.EncryptTest do
     end
   end
 
-
   test "encrypt throws error when the input is too large" do
-    assert_raise ArgumentError, "Payload is too large. The current length is 4081 bytes plus 0 bytes of padding but the max length is 4078 bytes", fn ->
-      Encrypt.encrypt(:binary.copy(<<0>>, 4081), "whatever", 0)
-    end
+    assert_raise ArgumentError,
+                 "Payload is too large. The current length is 4081 bytes plus 0 bytes of padding but the max length is 4078 bytes",
+                 fn ->
+                   Encrypt.encrypt(:binary.copy(<<0>>, 4081), "whatever", 0)
+                 end
 
-    assert_raise ArgumentError, "Payload is too large. The current length is 13 bytes plus 4080 bytes of padding but the max length is 4078 bytes", fn ->
-      Encrypt.encrypt(Fixtures.example_input(), "whatever", 4080)
-    end
+    assert_raise ArgumentError,
+                 "Payload is too large. The current length is 13 bytes plus 4080 bytes of padding but the max length is 4078 bytes",
+                 fn ->
+                   Encrypt.encrypt(Fixtures.example_input(), "whatever", 4080)
+                 end
   end
 
   test "encrypt returns the message with a valid subscription" do
@@ -40,7 +43,12 @@ defmodule WebPushEncryption.EncryptTest do
   end
 
   test "encrypt returns the correct output" do
-    Application.put_env(:web_push_encryption, :crypto_impl, WebPushEncryption.EncryptTest.DummyCrypto)
+    Application.put_env(
+      :web_push_encryption,
+      :crypto_impl,
+      WebPushEncryption.EncryptTest.DummyCrypto
+    )
+
     response = Encrypt.encrypt(Fixtures.example_input(), Fixtures.valid_subscription())
     assert response.ciphertext == Base.decode64!(Fixtures.example_output())
   after
