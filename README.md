@@ -14,15 +14,7 @@ Elixir implementation of [Web Push Payload encryption](https://developers.google
   end
   ```
 
-2. Ensure `web_push_encryption` is started before your application:
-
-  ```elixir
-  def application do
-    [applications: [:web_push_encryption]]
-  end
-  ```
-
-3. Generate a web push Vapid keypair on the CLI and put it in your `config.exs` file:
+2. Generate a web push Vapid keypair on the CLI and put it in your `config.exs` file:
 
 ```
  $ mix do deps.get, compile
