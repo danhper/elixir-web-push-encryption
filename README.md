@@ -10,7 +10,7 @@ Elixir implementation of [Web Push Payload encryption](https://developers.google
 
   ```elixir
   def deps do
-    [{:web_push_encryption, "~> 0.1.1"}]
+    [{:web_push_encryption, "~> 0.2.1"}]
   end
   ```
 
