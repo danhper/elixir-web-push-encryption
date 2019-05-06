@@ -6,7 +6,7 @@ defmodule WebPushEncryption.Push do
   alias WebPushEncryption.Vapid
 
   @fcm_url "https://fcm.googleapis.com/fcm/send"
-  @temp_fcm_url "https://fcm.googleapis.com/fcm"
+  @temp_fcm_url "https://fcm.googleapis.com/fcm/send"
 
   @doc """
   Sends a web push notification with a payload through GCM.
