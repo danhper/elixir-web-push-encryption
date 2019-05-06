@@ -5,8 +5,8 @@ defmodule WebPushEncryption.Push do
 
   alias WebPushEncryption.Vapid
 
-  @gcm_url "https://android.googleapis.com/gcm/send"
-  @temp_gcm_url "https://gcm-http.googleapis.com/gcm"
+  @fcm_url "https://fcm.googleapis.com/fcm/send"
+  @temp_fcm_url "https://fcm.googleapis.com/fcm"
 
   @doc """
   Sends a web push notification with a payload through GCM.
@@ -27,7 +27,7 @@ defmodule WebPushEncryption.Push do
           {:ok, any} | {:error, atom}
   def send_web_push(message, subscription, auth_token \\ nil)
 
-  def send_web_push(_message, %{endpoint: @gcm_url <> _registration_id}, nil) do
+  def send_web_push(_message, %{endpoint: @fcm_url <> _registration_id}, nil) do
     raise ArgumentError, "send_web_push requires an auth_token for gcm endpoints"
   end
 
@@ -56,7 +56,7 @@ defmodule WebPushEncryption.Push do
   end
 
   defp make_request_params(endpoint, headers, auth_token) do
-    if gcm_url?(endpoint) do
+    if fcm_url?(endpoint) do
       {make_gcm_endpoint(endpoint), headers |> Map.merge(gcm_authorization(auth_token))}
     else
       {endpoint, headers}
@@ -68,8 +68,8 @@ defmodule WebPushEncryption.Push do
     parsed.scheme <> "://" <> parsed.host
   end
 
-  defp gcm_url?(url), do: String.contains?(url, @gcm_url)
-  defp make_gcm_endpoint(endpoint), do: String.replace(endpoint, @gcm_url, @temp_gcm_url)
+  defp fcm_url?(url), do: String.contains?(url, @fcm_url)
+  defp make_gcm_endpoint(endpoint), do: String.replace(endpoint, @fcm_url, @temp_fcm_url)
   defp gcm_authorization(auth_token), do: %{"Authorization" => "key=#{auth_token}"}
 
   defp ub64(value) do
