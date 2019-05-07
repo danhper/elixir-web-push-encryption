@@ -30,6 +30,10 @@ defmodule WebPushEncryption.Push do
   def send_web_push(message, subscription, auth_token \\ nil)
 
   def send_web_push(_message, %{endpoint: @fcm_url <> _registration_id}, nil) do
+    raise ArgumentError, "send_web_push requires an auth_token for fcm endpoints"
+  end
+
+  def send_web_push(_message, %{endpoint: @gcm_url <> _registration_id}, nil) do
     raise ArgumentError, "send_web_push requires an auth_token for gcm endpoints"
   end
 
