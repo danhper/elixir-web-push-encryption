@@ -28,4 +28,15 @@ defmodule WebPushEncryption.PushTest do
     Push.send_web_push(Fixtures.example_input(), Fixtures.valid_gcm_subscription(), "auth_token")
     assert Enum.count(HTTPoisonSandbox.requests()) == 1
   end
+
+  test "fcm endpoint without auth_token" do
+    assert_raise ArgumentError, fn ->
+      Push.send_web_push(Fixtures.example_input(), Fixtures.valid_fcm_subscription())
+    end
+  end
+
+  test "fcm endpoint with auth_token" do
+    Push.send_web_push(Fixtures.example_input(), Fixtures.valid_fcm_subscription(), "auth_token")
+    assert Enum.count(HTTPoisonSandbox.requests()) == 1
+  end
 end
