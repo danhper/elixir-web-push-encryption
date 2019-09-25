@@ -20,30 +20,34 @@ defmodule WebPushEncryption.Push do
        It should have the following form: `%{keys: %{auth: AUTH, p256dh: P256DH}, endpoint: ENDPOINT}`
     * `auth_token` [Optional] is the GCM api key matching the `gcm_sender_id` from the client `manifest.json`.
        It is not necessary for Mozilla endpoints.
+    * `ttl` [Optional] is a non-negative integer Time To Live.
+       It is the number of seconds that a message may be stored if the user is not immediately available.
+       Mozilla Push Service only supports a maximum TTL of 5,184,000 seconds (about one month).
 
   ## Return value
 
   Returns the result of `HTTPoison.post`
   """
-  @spec send_web_push(message :: binary, subscription :: map, auth_token :: binary | nil) ::
+  @spec send_web_push(message :: binary, subscription :: map, auth_token :: binary | nil, ttl :: integer) ::
           {:ok, any} | {:error, atom}
-  def send_web_push(message, subscription, auth_token \\ nil)
+  def send_web_push(message, subscription, auth_token \\ nil, ttl \\ 0)
 
-  def send_web_push(_message, %{endpoint: @fcm_url <> _registration_id}, nil) do
-    raise ArgumentError, "send_web_push requires an auth_token for fcm endpoints"
+  def send_web_push(_message, _subscription, _auth_token, ttl) when not is_integer(ttl) or ttl < 0 do
+    raise ArgumentError,
+          "send_web_push expects a non-negative integer ttl"
   end
 
-  def send_web_push(_message, %{endpoint: @gcm_url <> _registration_id}, nil) do
+  def send_web_push(_message, %{endpoint: @gcm_url <> _registration_id}, nil, _ttl) do
     raise ArgumentError, "send_web_push requires an auth_token for gcm endpoints"
   end
 
-  def send_web_push(message, %{endpoint: endpoint} = subscription, auth_token) do
+  def send_web_push(message, %{endpoint: endpoint} = subscription, auth_token, ttl) do
     payload = WebPushEncryption.Encrypt.encrypt(message, subscription)
 
     headers =
       Vapid.get_headers(make_audience(endpoint), "aesgcm")
       |> Map.merge(%{
-        "TTL" => "0",
+        "TTL" => to_string(ttl),
         "Content-Encoding" => "aesgcm",
         "Encryption" => "salt=#{ub64(payload.salt)}"
       })
@@ -56,7 +60,7 @@ defmodule WebPushEncryption.Push do
     http_client().post(endpoint, payload.ciphertext, headers)
   end
 
-  def send_web_push(_message, _subscription, _auth_token) do
+  def send_web_push(_message, _subscription, _auth_token, _ttl) do
     raise ArgumentError,
           "send_web_push expects a subscription endpoint with an endpoint parameter"
   end
@@ -66,7 +70,7 @@ defmodule WebPushEncryption.Push do
       gcm_url?(endpoint) ->
         {make_gcm_endpoint(endpoint), headers |> Map.merge(fcm_gcm_authorization(auth_token))}
 
-      fcm_url?(endpoint) ->
+      fcm_url?(endpoint) and not is_nil(auth_token) ->
         {endpoint, headers |> Map.merge(fcm_gcm_authorization(auth_token))}
 
       true ->
@@ -79,8 +83,8 @@ defmodule WebPushEncryption.Push do
     parsed.scheme <> "://" <> parsed.host
   end
 
-  defp fcm_url?(url), do: String.contains?(url, @fcm_url)
-  defp gcm_url?(url), do: String.contains?(url, @gcm_url)
+  defp fcm_url?(url), do: String.starts_with?(url, @fcm_url)
+  defp gcm_url?(url), do: String.starts_with?(url, @gcm_url)
   defp make_gcm_endpoint(endpoint), do: String.replace(endpoint, @gcm_url, @temp_gcm_url)
   defp fcm_gcm_authorization(auth_token), do: %{"Authorization" => "key=#{auth_token}"}
 
