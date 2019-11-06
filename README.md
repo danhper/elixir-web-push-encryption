@@ -1,6 +1,6 @@
 # WebPushEncryption
 
-[![Build Status](https://travis-ci.org/tuvistavie/elixir-web-push-encryption.svg?branch=master)](https://travis-ci.org/tuvistavie/elixir-web-push-encryption)
+[![Build Status](https://travis-ci.org/danhper/elixir-web-push-encryption.svg?branch=master)](https://travis-ci.org/danhper/elixir-web-push-encryption)
 
 Elixir implementation of [Web Push Payload encryption](https://developers.google.com/web/updates/2016/03/web-push-encryption?hl=en).
 
@@ -10,7 +10,7 @@ Elixir implementation of [Web Push Payload encryption](https://developers.google
 
   ```elixir
   def deps do
-    [{:web_push_encryption, "~> 0.2.2"}]
+    [{:web_push_encryption, "~> 0.2"}]
   end
   ```
 
