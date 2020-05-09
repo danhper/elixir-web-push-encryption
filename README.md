@@ -12,7 +12,7 @@ Elixir implementation of [Web Push Payload encryption](https://developers.google
   def deps do
     [
       {:poison, "~> 0.4"}, # see jose docs for more options here
-      {:web_push_encryption, "~> 0.2"}
+      {:web_push_encryption, "~> 0.3"}
     ]
   end
   ```
