@@ -8,7 +8,7 @@ defmodule WebPushEncryption.Mixfile do
       app: :web_push_encryption,
       version: @version,
       elixir: "~> 1.4",
-      description: "Web push encryption lilbrary",
+      description: "Web push encryption library",
       source_url: "https://github.com/tuvistavie/elixir-web-push-encryption",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
@@ -26,7 +26,7 @@ defmodule WebPushEncryption.Mixfile do
     [
       {:httpoison, "~> 1.0"},
       {:jose, "~> 1.8"},
-      {:poison, "~> 3.0"},
+      {:poison, "~> 3.0", only: [:dev, :test]},
       {:earmark, "~> 1.0", only: :dev},
       {:ex_doc, "~> 0.11", only: :dev}
     ]

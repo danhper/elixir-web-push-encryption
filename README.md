@@ -6,11 +6,14 @@ Elixir implementation of [Web Push Payload encryption](https://developers.google
 
 ## Installation
 
-1. Add `web_push_encryption` to your list of dependencies in `mix.exs`.
+1. Add `web_push_encryption` and a json library for jose to your list of dependencies in `mix.exs`.
 
   ```elixir
   def deps do
-    [{:web_push_encryption, "~> 0.2"}]
+    [
+      {:poison, "~> 0.4"}, # see jose docs for more options here
+      {:web_push_encryption, "~> 0.2"}
+    ]
   end
   ```
 
