@@ -63,29 +63,18 @@ defmodule WebPushEncryption.Encrypt do
 
     shared_secret = :crypto.compute_key(:ecdh, client_public_key, server_private_key, :prime256v1)
 
-    prk = hkdf(client_auth_token, shared_secret, @auth_info, 32)
+    prk = :hkdf.derive(:sha256, shared_secret, @auth_info, client_auth_token, 32)
 
     context = create_context(client_public_key, server_public_key)
 
     content_encryption_key_info = create_info("aesgcm", context)
-    content_encryption_key = hkdf(salt, prk, content_encryption_key_info, 16)
+    content_encryption_key = :hkdf.derive(:sha256, prk, content_encryption_key_info, salt, 16)
 
     nonce_info = create_info("nonce", context)
-    nonce = hkdf(salt, prk, nonce_info, 12)
+    nonce = :hkdf.derive(:sha256, prk, nonce_info, salt, 12)
 
     ciphertext = encrypt_payload(plaintext, content_encryption_key, nonce)
     %{ciphertext: ciphertext, salt: salt, server_public_key: server_public_key}
-  end
-
-  defp hkdf(salt, ikm, info, length) do
-    prk_hmac = :crypto.mac_init(:hmac, :sha256, salt)
-    prk_hmac = :crypto.mac_update(prk_hmac, ikm)
-    prk = :crypto.mac_final(prk_hmac)
-
-    info_hmac = :crypto.mac_init(:hmac, :sha256, prk)
-    info_hmac = :crypto.mac_update(info_hmac, info)
-    info_hmac = :crypto.mac_update(info_hmac, @one_buffer)
-    :crypto.mac_final(info_hmac) |> :binary.part(0, length)
   end
 
   defp create_context(client_public_key, _server_public_key)

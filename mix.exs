@@ -28,6 +28,7 @@ defmodule WebPushEncryption.Mixfile do
       {:jose, "~> 1.11.1"},
       {:poison, "~> 3.0", only: [:dev, :test]},
       {:earmark, "~> 1.0", only: :dev},
+      {:hkdf_erlang, "~> 0.1.0"},
       {:ex_doc, "~> 0.11", only: :dev}
     ]
   end
