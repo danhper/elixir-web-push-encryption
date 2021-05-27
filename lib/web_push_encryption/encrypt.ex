@@ -78,14 +78,14 @@ defmodule WebPushEncryption.Encrypt do
   end
 
   defp hkdf(salt, ikm, info, length) do
-    prk_hmac = :crypto.hmac_init(:sha256, salt)
-    prk_hmac = :crypto.hmac_update(prk_hmac, ikm)
-    prk = :crypto.hmac_final(prk_hmac)
+    prk_hmac = :crypto.mac_init(:hmac, :sha256, salt)
+    prk_hmac = :crypto.mac_update(prk_hmac, ikm)
+    prk = :crypto.mac_final(prk_hmac)
 
-    info_hmac = :crypto.hmac_init(:sha256, prk)
-    info_hmac = :crypto.hmac_update(info_hmac, info)
-    info_hmac = :crypto.hmac_update(info_hmac, @one_buffer)
-    :crypto.hmac_final(info_hmac) |> :binary.part(0, length)
+    info_hmac = :crypto.mac_init(:hmac, :sha256, prk)
+    info_hmac = :crypto.mac_update(info_hmac, info)
+    info_hmac = :crypto.mac_update(info_hmac, @one_buffer)
+    :crypto.mac_final(info_hmac) |> :binary.part(0, length)
   end
 
   defp create_context(client_public_key, _server_public_key)
