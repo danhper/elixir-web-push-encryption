@@ -11,8 +11,6 @@ defmodule WebPushEncryption.Encrypt do
 
   @max_payload_length 4078
 
-  @one_buffer <<1>>
-
   @auth_info "Content-Encoding: auth" <> <<0>>
 
   @doc """
