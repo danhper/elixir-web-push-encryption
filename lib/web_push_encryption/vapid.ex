@@ -19,8 +19,14 @@ defmodule WebPushEncryption.Vapid do
       }
       |> JOSE.JWT.from_map()
 
+    otp_version = :erlang.system_info(:otp_release) |> String.Chars.to_string() |> String.to_integer
+
     jwk =
-      {:ECPrivateKey, 1, private_key, {:namedCurve, {1, 2, 840, 10045, 3, 1, 7}}, public_key}
+      if otp_version < 24 do
+        {:ECPrivateKey, 1, private_key, {:namedCurve, {1, 2, 840, 10045, 3, 1, 7}}, public_key}
+      else
+        {:ECPrivateKey, 1, private_key, {:namedCurve, {1, 2, 840, 10045, 3, 1, 7}}, public_key, nil}
+      end
       |> JOSE.JWK.from_key()
 
     {_, jwt} = JOSE.JWS.compact(JOSE.JWT.sign(jwk, %{"alg" => "ES256"}, payload))
