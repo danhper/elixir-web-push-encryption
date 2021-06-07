@@ -28,11 +28,17 @@ defmodule WebPushEncryption.Push do
 
   Returns the result of `HTTPoison.post`
   """
-  @spec send_web_push(message :: binary, subscription :: map, auth_token :: binary | nil, ttl :: integer) ::
+  @spec send_web_push(
+          message :: binary,
+          subscription :: map,
+          auth_token :: binary | nil,
+          ttl :: integer
+        ) ::
           {:ok, any} | {:error, atom}
   def send_web_push(message, subscription, auth_token \\ nil, ttl \\ 0)
 
-  def send_web_push(_message, _subscription, _auth_token, ttl) when not is_integer(ttl) or ttl < 0 do
+  def send_web_push(_message, _subscription, _auth_token, ttl)
+      when not is_integer(ttl) or ttl < 0 do
     raise ArgumentError,
           "send_web_push expects a non-negative integer ttl"
   end
