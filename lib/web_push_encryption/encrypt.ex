@@ -96,11 +96,20 @@ defmodule WebPushEncryption.Encrypt do
     "Content-Encoding: " <> type <> <<0>> <> "P-256" <> context
   end
 
-  defp encrypt_payload(plaintext, content_encryption_key, nonce) do
-    {cipher_text, cipher_tag} =
-      :crypto.crypto_one_time_aead(:aes_128_gcm, content_encryption_key, nonce, plaintext, "", true);
+  if Code.ensure_loaded?(:crypto) and function_exported?(:crypto, :crypto_one_time_aead, 6) do
+    defp encrypt_payload(plaintext, content_encryption_key, nonce) do
+      {cipher_text, cipher_tag} =
+        :crypto.crypto_one_time_aead(:aes_128_gcm, content_encryption_key, nonce, plaintext, "", true);
 
-    cipher_text <> cipher_tag
+      cipher_text <> cipher_tag
+    end
+  else
+    defp encrypt_payload(plaintext, content_encryption_key, nonce) do
+      {cipher_text, cipher_tag} =
+        :crypto.block_encrypt(:aes_gcm, content_encryption_key, nonce, {"", plaintext})
+
+      cipher_text <> cipher_tag
+    end
   end
 
   defp validate_subscription(%{keys: %{p256dh: p256dh, auth: auth}})
