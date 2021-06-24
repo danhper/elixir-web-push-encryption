@@ -2,6 +2,10 @@ defmodule WebPushEncryption.Vapid do
   # aes128gcm not yet supported in push.ex
   @supported_encodings ~w(aesgcm)
 
+  @otp_version :otp_release
+               |> :erlang.system_info()
+               |> List.to_integer()
+
   def get_headers(audience, content_encoding, expiration \\ 12 * 3600, vapid \\ nil)
       when content_encoding in @supported_encodings do
     expiration_timestamp = DateTime.to_unix(DateTime.utc_now()) + expiration
@@ -19,9 +23,14 @@ defmodule WebPushEncryption.Vapid do
       }
       |> JOSE.JWT.from_map()
 
-    jwk =
-      {:ECPrivateKey, 1, private_key, {:namedCurve, {1, 2, 840, 10045, 3, 1, 7}}, public_key}
-      |> JOSE.JWK.from_key()
+    private_key_record =
+      if @otp_version < 24 do
+        {:ECPrivateKey, 1, private_key, {:namedCurve, {1, 2, 840, 10045, 3, 1, 7}}, public_key}
+      else
+        {:ECPrivateKey, 1, private_key, {:namedCurve, {1, 2, 840, 10045, 3, 1, 7}}, public_key, nil}
+      end
+
+    jwk = JOSE.JWK.from_key(private_key_record)
 
     {_, jwt} = JOSE.JWS.compact(JOSE.JWT.sign(jwk, %{"alg" => "ES256"}, payload))
     headers(content_encoding, jwt, vapid[:public_key])

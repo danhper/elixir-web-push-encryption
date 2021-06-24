@@ -1,6 +1,6 @@
 # WebPushEncryption
 
-[![Build Status](https://travis-ci.org/danhper/elixir-web-push-encryption.svg?branch=master)](https://travis-ci.org/danhper/elixir-web-push-encryption)
+![CI workflow badge](https://github.com/github/docs/actions/workflows/ci.yml/badge.svg)
 
 Elixir implementation of [Web Push Payload encryption](https://developers.google.com/web/updates/2016/03/web-push-encryption?hl=en).
 
