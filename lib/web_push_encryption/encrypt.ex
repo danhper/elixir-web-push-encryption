@@ -15,6 +15,10 @@ defmodule WebPushEncryption.Encrypt do
 
   @auth_info "Content-Encoding: auth" <> <<0>>
 
+  @otp_version :erlang.system_info(:otp_release)
+               |> String.Chars.to_string()
+               |> String.to_integer()
+
   @doc """
   Encrypts a web push notification body.
 
@@ -77,15 +81,31 @@ defmodule WebPushEncryption.Encrypt do
     %{ciphertext: ciphertext, salt: salt, server_public_key: server_public_key}
   end
 
+  @compile {:no_warn_undefined, {:crypto, :hmac_init, 2}}
+  @compile {:no_warn_undefined, {:crypto, :hmac_update, 2}}
+  @compile {:no_warn_undefined, {:crypto, :hmac_final, 1}}
   defp hkdf(salt, ikm, info, length) do
-    prk_hmac = :crypto.hmac_init(:sha256, salt)
-    prk_hmac = :crypto.hmac_update(prk_hmac, ikm)
-    prk = :crypto.hmac_final(prk_hmac)
+    if @otp_version < 24 do
+      prk_hmac = :crypto.hmac_init(:sha256, salt)
+      prk_hmac = :crypto.hmac_update(prk_hmac, ikm)
+      prk = :crypto.hmac_final(prk_hmac)
 
-    info_hmac = :crypto.hmac_init(:sha256, prk)
-    info_hmac = :crypto.hmac_update(info_hmac, info)
-    info_hmac = :crypto.hmac_update(info_hmac, @one_buffer)
-    :crypto.hmac_final(info_hmac) |> :binary.part(0, length)
+      info_hmac = :crypto.hmac_init(:sha256, prk)
+      info_hmac = :crypto.hmac_update(info_hmac, info)
+      info_hmac = :crypto.hmac_update(info_hmac, @one_buffer)
+      :crypto.hmac_final(info_hmac) |> :binary.part(0, length)
+    else
+      prk =
+        :crypto.mac_init(:hmac, :sha256, salt)
+        |> :crypto.mac_update(ikm)
+        |> :crypto.mac_final()
+
+      :crypto.mac_init(:hmac, :sha256, prk)
+      |> :crypto.mac_update(info)
+      |> :crypto.mac_update(@one_buffer)
+      |> :crypto.mac_final()
+      |> :binary.part(0, length)
+    end
   end
 
   defp create_context(client_public_key, _server_public_key)
@@ -109,9 +129,20 @@ defmodule WebPushEncryption.Encrypt do
     "Content-Encoding: " <> type <> <<0>> <> "P-256" <> context
   end
 
+  @compile {:no_warn_undefined, {:crypto, :block_encrypt, 4}}
   defp encrypt_payload(plaintext, content_encryption_key, nonce) do
     {cipher_text, cipher_tag} =
-      :crypto.block_encrypt(:aes_gcm, content_encryption_key, nonce, {"", plaintext})
+      if @otp_version < 24,
+        do: :crypto.block_encrypt(:aes_gcm, content_encryption_key, nonce, {"", plaintext}),
+        else:
+          :crypto.crypto_one_time_aead(
+            :aes_128_gcm,
+            content_encryption_key,
+            nonce,
+            plaintext,
+            "",
+            true
+          )
 
     cipher_text <> cipher_tag
   end
