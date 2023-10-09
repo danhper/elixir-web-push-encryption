@@ -63,7 +63,16 @@ defmodule WebPushEncryption.Push do
       |> Map.put("Crypto-Key", "dh=#{ub64(payload.server_public_key)};" <> headers["Crypto-Key"])
 
     {endpoint, headers} = make_request_params(endpoint, headers, auth_token)
-    options = [ssl: [{:versions, [:"tlsv1.2"]}]]
+    options = [
+      ssl: [
+        verify: :verify_peer,
+        cacerts: :public_key.cacerts_get(),
+        versions: [:"tlsv1.2"],
+        customize_hostname_check: [
+          match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
+        ]
+      ]
+    ]
     http_client().post(endpoint, payload.ciphertext, headers, options)
   end
 
